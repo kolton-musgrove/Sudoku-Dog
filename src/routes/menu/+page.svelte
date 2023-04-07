@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { createSolution, grid } from '$lib/utility';
+	import { createSolution, createStartingGrid } from '$lib/utility';
 	import type { Game } from '$lib/types';
 	import { v4 as uuid } from 'uuid';
 
@@ -20,6 +20,10 @@
 			}
 		};
 
+		const grid: number[][] = createStartingGrid();
+
+		console.log(grid);
+
 		// We need to create a function to generate a starting grid
 		// const grid = createStartingGrid()
 		// create a solution to the grid
@@ -31,7 +35,7 @@
 		if (gameProps.difficulty === 'easy') {
 			grid.map((row, i) => {
 				row.map((col, j) => {
-					if (Math.random() < 0.4) {
+					if (Math.random() < 0.5) {
 						grid[i][j] = 0;
 					}
 				});
@@ -39,7 +43,7 @@
 		} else if (gameProps.difficulty === 'medium') {
 			grid.map((row, i) => {
 				row.map((col, j) => {
-					if (Math.random() < 0.5) {
+					if (Math.random() < 0.6) {
 						grid[i][j] = 0;
 					}
 				});

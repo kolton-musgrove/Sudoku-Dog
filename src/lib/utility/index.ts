@@ -1,1 +1,1 @@
-export { createSolution, grid } from './generate-board';
+export { createSolution, createStartingGrid } from './generate-board';
