@@ -22,11 +22,6 @@
 
 		const grid: number[][] = createStartingGrid();
 
-		console.log(grid);
-
-		// We need to create a function to generate a starting grid
-		// const grid = createStartingGrid()
-		// create a solution to the grid
 		createSolution(grid);
 
 		game.correctBoard = grid.map((row: number[]) => [...row]);
