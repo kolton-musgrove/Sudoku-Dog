@@ -52,10 +52,6 @@
 		const target = event.target as HTMLInputElement;
 		const value = target.value;
 
-		if (value.length > 1) {
-			target.value = value.slice(0, 1);
-		}
-
 		currentBoard[rowIndex][cellIndex] = parseInt(value);
 		currentBoard = currentBoard;
 	}
@@ -96,9 +92,14 @@
 								<input
 									type="number"
 									class="w-5 h-5 text-center text-md font-bold"
-									maxlength="1"
 									value={cell !== 0 ? cell : ''}
 									on:change={(event) => handleInput(event, rowIndex, cellIndex)}
+									on:input={(event) => {
+										event.target.value = event.target.value.slice(0, 1);
+										if (event.target.value == "0") {
+											event.target.value = "";
+										}
+									}}
 								/>
 							</div>
 						{/each}
