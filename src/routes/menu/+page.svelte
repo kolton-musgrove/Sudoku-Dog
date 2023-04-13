@@ -59,7 +59,42 @@
 
 		goto(`/game/${game.id}`);
 	}
+
+	import Modal,{getModal} from './Modal.svelte'
+	let name = 'world';
+	
+	let selection
+	
+	// Callback function provided to the `open` function, it receives the value given to the `close` function call, or `undefined` if the Modal was closed with escape or clicking the X, etc.
+	function setSelection(res){
+		selection=res
+	}
+	
 </script>
+
+<!-- Simplest use: modal without an `id` or callback function -->
+<button on:click={()=>getModal().open()}>
+	Tutorial
+</button>
+
+<!-- the modal without an `id` -->
+<Modal>
+	<h1>Sudoku!</h1>
+	<h2>The rules for sudoku are simple.
+		A 4x4, 9×9, or 12x12 square must be filled in with numbers from 1-9 with no repeated numbers in each line, horizontally or vertically. </h2>
+		
+		<h2>To challenge you more, there are 3×3 squares marked out in the grid, and each of these squares can’t have any repeat numbers either. </h2>
+		
+		<h2>
+	   The fewer numbers provided, the more difficult the puzzle.	   
+		</h2>
+	<!-- opening a model with an `id` and specifying a callback	 -->
+	{#if selection}
+	<p>
+		Your selection was: {selection}
+	</p>
+	{/if}
+</Modal>
 
 <main class="flex flex-col items-center">
 	<header>
