@@ -29,13 +29,9 @@
 	/**
 	 * handles user input, checks for mistakes, and saves the game
 	 */
-	function handleInput(event: Event, rowIndex: number, cellIndex: number) {
+	function handleChange(event: Event, rowIndex: number, cellIndex: number) {
 		const target = event.target as HTMLInputElement;
 		const value = target.value;
-
-		if (value.length > 1) {
-			target.value = value.slice(0, 1);
-		}
 
 		game.currentBoard[rowIndex][cellIndex] = parseInt(value);
 
@@ -81,6 +77,15 @@
 	function isEditable(rowIndex: number, cellIndex: number) {
 		return game.originalBoard[rowIndex][cellIndex] === 0;
 	}
+
+	function handleInput(event: Event) {
+		const element = event.currentTarget as HTMLInputElement;
+		const value = element.value;
+
+		if (value.length > 1) {
+			element.value = value.slice(0, 1);
+		}
+	}
 </script>
 
 {#if game}
@@ -113,8 +118,9 @@
 									class:text-black={isEditable(rowIndex, cellIndex)}
 									class:bg-red-200={checkForMistake(rowIndex, cellIndex, cell)}
 									disabled={!isEditable(rowIndex, cellIndex)}
-									value={cell}
-									on:change={(event) => handleInput(event, rowIndex, cellIndex)}
+									maxlength="1"
+									value={cell !== 0 ? cell : ''}
+									on:change={(event) => handleChange(event, rowIndex, cellIndex)}
 								/>
 							{/each}
 						</div>
