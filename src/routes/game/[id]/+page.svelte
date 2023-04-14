@@ -80,18 +80,18 @@
 				{#each currentBoard as row, rowIndex}
 					<div
 						class="text-center flex text-2xl {[3, 6].includes(rowIndex)
-							? 'border-t-2 border-solid border-black'
-							: ''}"
+							? 'border-t-2 border-solid border-black dark:border-white'
+							: 'dark:border-gray-500'}"
 					>
 						{#each row as cell, cellIndex}
 							<div
 								class="text-center border p-4 {[3, 6].includes(cellIndex)
-									? 'border-l-2 border-t-gray-200 border-r-gray-200 border-b-gray-200 border-solid border-black'
-									: ''}"
+									? 'border-l-2 border-t-gray-200 border-r-gray-200 border-b-gray-200 border-solid border-black dark:border-t-gray-500 dark:border-r-gray-500 dark:border-b-gray-500 dark:border-white'
+									: 'dark:border-gray-500'}"
 							>
 								<input
 									type="number"
-									class="w-5 h-5 text-center text-md font-bold"
+									class="w-5 h-5 text-center text-md font-bold dark:bg-gray-700"
 									value={cell !== 0 ? cell : ''}
 									on:change={(event) => handleInput(event, rowIndex, cellIndex)}
 									on:input={(event) => {
