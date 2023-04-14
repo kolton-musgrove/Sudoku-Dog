@@ -48,16 +48,25 @@
 		console.log(game);
 	}
 
-	function handleInput(event: Event, rowIndex: number, cellIndex: number) {
+	function handleChange(event: Event, rowIndex: number, cellIndex: number) {
 		const target = event.target as HTMLInputElement;
 		const value = target.value;
 
-		if (value.length > 1) {
-			target.value = value.slice(0, 1);
-		}
-
 		currentBoard[rowIndex][cellIndex] = parseInt(value);
 		currentBoard = currentBoard;
+	}
+
+	function handleInput(
+		event: Event & {
+			currentTarget: EventTarget & HTMLInputElement;
+		}
+	) {
+		const element = event.currentTarget as HTMLInputElement;
+		const value = element.value;
+
+		if (value.length > 1) {
+			element.value = value.slice(0, 1);
+		}
 	}
 </script>
 
@@ -83,22 +92,22 @@
 			<div class="mx-4 w-fit">
 				{#each currentBoard as row, rowIndex}
 					<div
-						class="text-center flex text-2xl {[3, 6].includes(rowIndex)
+						class="flex text-center text-2xl {[3, 6].includes(rowIndex)
 							? 'border-t-2 border-solid border-black'
 							: ''}"
 					>
 						{#each row as cell, cellIndex}
 							<div
-								class="text-center border p-4 {[3, 6].includes(cellIndex)
-									? 'border-l-2 border-t-gray-200 border-r-gray-200 border-b-gray-200 border-solid border-black'
+								class="border p-4 text-center {[3, 6].includes(cellIndex)
+									? 'border-l-2 border-solid border-black border-b-gray-200 border-r-gray-200 border-t-gray-200'
 									: ''}"
 							>
 								<input
 									type="number"
-									class="w-5 h-5 text-center text-md font-bold"
-									maxlength="1"
+									class="text-md h-5 w-5 text-center font-bold"
 									value={cell !== 0 ? cell : ''}
-									on:change={(event) => handleInput(event, rowIndex, cellIndex)}
+									on:change={(event) => handleChange(event, rowIndex, cellIndex)}
+									on:input={(event) => handleInput(event)}
 								/>
 							</div>
 						{/each}
