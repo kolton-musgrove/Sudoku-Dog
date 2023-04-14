@@ -1,30 +1,36 @@
-export const grid: number[][] = [
-	[0, 0, 6, 5, 0, 8, 4, 0, 0],
-	[5, 2, 0, 0, 0, 0, 0, 0, 0],
-	[0, 8, 7, 0, 0, 0, 0, 3, 1],
-	[0, 0, 3, 0, 1, 0, 0, 8, 0],
-	[9, 0, 0, 8, 6, 3, 0, 0, 5],
-	[0, 5, 0, 0, 9, 0, 6, 0, 0],
-	[1, 3, 0, 0, 0, 0, 2, 5, 0],
-	[0, 0, 0, 0, 0, 0, 0, 7, 4],
-	[0, 0, 5, 2, 0, 6, 3, 0, 0]
-];
+export function createStartingGrid(): number[][] {
+	let grid: number[][] = new Array(9).fill(new Array(9).fill(0));
 
-// export function createStartingGrid(): number[][] {
-//   const grid: number[][] = new Array(9).fill(new Array(9).fill(0))
+	// randomly select a cell and assign a number between 1 and 9 to it
+	let rowNum = Math.floor(Math.random() * 9);
+	let colNum = Math.floor(Math.random() * 9);
+	let num = Math.floor(Math.random() * 9) + 1;
 
-//   for (let i = 0; i < 9; i++) {
-//     for (let j = 0; j < 9; j++) {
-//       if (Math.random() > 0.95) {
-//         grid[i][j] = Math.floor(Math.random() * 9) + 1
-//       }
-//     }
-//   }
+	grid = grid.map((row, rowIndex) => {
+		return row.map((_, colIndex) => {
+			if (rowIndex === rowNum && colIndex === colNum) {
+				return num;
+			}
 
-//   console.log(`Starting grid, ${grid}`)
+			return 0;
+		});
+	});
 
-//   return grid
-// }
+	// the above method in conjunction with the backtracking algorithm
+	// will create a puzzle with the same top-left grid. To prevent this,
+	// we will randomly select a cell in the top-left grid and assign it.
+	// This is a temporary solution that might cause the puzzle to be unsolvable.
+
+	// randomly select a cell in the top-left grid
+	rowNum = Math.floor(Math.random() * 3);
+	colNum = Math.floor(Math.random() * 3);
+	num = Math.floor(Math.random() * 9) + 1;
+
+	grid[rowNum][colNum] = num;
+	grid = grid;
+
+	return grid;
+}
 
 /**
  * an in-place backtracking algorithm to solve a sudoku board
