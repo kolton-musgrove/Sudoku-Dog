@@ -72,7 +72,7 @@
 </script>
 
 <!-- Simplest use: modal without an `id` or callback function -->
-<button on:click={()=>getModal().open()}>
+<button class="move" on:click={()=>getModal().open()}>
 	Tutorial
 </button>
 
@@ -200,5 +200,17 @@
 	.active {
 		background-color: rgb(219 234 254);
 		color: rgb(23 37 84);
+	}
+
+	.move{
+		background-color: white;
+		color: Blue;
+		width: 100%;
+  		left: 0;
+  		bottom: 10px;
+  		position: absolute;
+		font-weight:bold;
+		font-variant: small-caps;
+
 	}
 </style>

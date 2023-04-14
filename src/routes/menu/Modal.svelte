@@ -84,18 +84,23 @@ onDestroy(()=>{
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		
 	}
 	#modal {
 		position: relative;
 		border-radius: 6px;
 		background: white;
-    border: 2px solid #000;
+    	border: 2px solid #000;
 		filter: drop-shadow(5px 5px 5px #555);
 		padding: 1em;
         padding-right: 5px;
         padding-left: 5px;
+		justify-content: center;
+ 		align-items: center;
+
 	}
 
+	
 	.visible {
 		visibility: visible !important;
 	}
@@ -129,5 +134,6 @@ onDestroy(()=>{
         list-style-type: circle;
     }
     
+	
 
 </style>
