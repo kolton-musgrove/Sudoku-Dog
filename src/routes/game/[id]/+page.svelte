@@ -85,6 +85,10 @@
 		if (value.length > 1) {
 			element.value = value.slice(0, 1);
 		}
+
+		if (value === '0') {
+			element.value = '';
+		}
 	}
 </script>
 
@@ -112,8 +116,8 @@
 							{#each row as cell, cellIndex}
 								<input
 									type="number"
-									class="w/ border bg-white p-3 text-center text-lg font-bold focus:bg-blue-200"
-									class:cell-border-right={[3, 6].includes(cellIndex)}
+									class="w-12 border bg-white p-3 text-center text-lg font-bold focus:bg-blue-200"
+									class:cell-border-left={[3, 6].includes(cellIndex)}
 									class:cell-border-top={[3, 6].includes(rowIndex)}
 									class:text-black={isEditable(rowIndex, cellIndex)}
 									class:bg-red-200={checkForMistake(rowIndex, cellIndex, cell)}
@@ -121,6 +125,7 @@
 									maxlength="1"
 									value={cell !== 0 ? cell : ''}
 									on:change={(event) => handleChange(event, rowIndex, cellIndex)}
+									on:input={handleInput}
 								/>
 							{/each}
 						</div>
@@ -141,11 +146,11 @@
 {/if}
 
 <style>
-	.cell-border-right {
-		@apply border-l-2 border-solid border-black border-b-gray-200 border-r-gray-200 border-t-gray-200;
+	.cell-border-left {
+		@apply border-l-2 border-solid border-l-black;
 	}
 
 	.cell-border-top {
-		@apply border-t-2 border-solid border-black;
+		@apply border-t-2 border-solid border-t-black;
 	}
 </style>
