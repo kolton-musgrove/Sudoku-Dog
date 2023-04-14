@@ -61,7 +61,6 @@
 	}
 
 	import Modal,{getModal} from './Modal.svelte'
-	let name = 'world';
 	
 	let selection
 	
