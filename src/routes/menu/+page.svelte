@@ -17,7 +17,6 @@
 			currentBoard: [],
 			correctBoard: [],
 			originalBoard: [],
-			mistakes: [],
 			timer: {
 				state: 'stopped',
 				duration: 0
@@ -29,41 +28,43 @@
 			}
 		};
 
-		const grid: number[][] = createStartingGrid();
+		const solution: number[][] = createStartingGrid();
 
-		createSolution(grid);
+		createSolution(solution);
 
-		game.correctBoard = grid.map((row: number[]) => [...row]);
+		game.correctBoard = solution;
+
+		const gameBoard: (number | null)[][] = solution.map((row: number[]) => [...row]);
 
 		// remove numbers from the grid based on difficulty
 		if (gameProps.difficulty === 'easy') {
-			grid.map((row, i) => {
+			gameBoard.map((row, i) => {
 				row.map((col, j) => {
 					if (Math.random() < 0.5) {
-						grid[i][j] = 0;
+						gameBoard[i][j] = null;
 					}
 				});
 			});
 		} else if (gameProps.difficulty === 'medium') {
-			grid.map((row, i) => {
+			gameBoard.map((row, i) => {
 				row.map((col, j) => {
 					if (Math.random() < 0.6) {
-						grid[i][j] = 0;
+						gameBoard[i][j] = null;
 					}
 				});
 			});
 		} else if (gameProps.difficulty === 'hard') {
-			grid.map((row, i) => {
+			gameBoard.map((row, i) => {
 				row.map((col, j) => {
 					if (Math.random() < 0.8) {
-						grid[i][j] = 0;
+						gameBoard[i][j] = null;
 					}
 				});
 			});
 		}
 
-		game.currentBoard = grid;
-		game.originalBoard = grid.map((row: number[]) => [...row]);
+		game.currentBoard = gameBoard;
+		game.originalBoard = gameBoard.map((row: (number | null)[]) => [...row]);
 
 		localStorage.setItem(game.id, JSON.stringify(game));
 
@@ -71,13 +72,13 @@
 	}
 </script>
 
-<main class="flex flex-col items-center">
+<main class="flex h-full w-full flex-col items-center">
 	<header class="text-center">
 		<h1 class="text-4xl">Sudoku Dog</h1>
 		<p class="text-lg">A simple sudoku game</p>
 	</header>
 
-	<div class="flex w-1/2 flex-col items-center">
+	<div class="flex flex-col items-center lg:w-1/4">
 		<div class="flex w-full flex-row items-center justify-between">
 			<p class="p-5 text-lg">Timer</p>
 			<div class="inline-flex rounded-md shadow-sm" role="group">
@@ -179,7 +180,7 @@
 	</button>
 
 	<Modal bind:showModal>
-		<div class="flex w-full flex-col">
+		<div class="flex w-full flex-col dark:bg-gray-700">
 			<h1 class="mb-2 self-center text-lg font-bold">Sudoku!</h1>
 
 			<ul class="ml-5 list-disc">

@@ -16,15 +16,19 @@
 	on:close={() => (showModal = false)}
 	on:click|self={() => dialog.close()}
 	on:keypress={handleKeyPress}
-	class="w-3/4 rounded-lg"
+	class="w-3/4 rounded-lg text-gray-200 shadow-lg dark:bg-gray-700"
 >
-	<div on:click|stopPropagation on:keypress|stopPropagation class="flex flex-col items-center">
-		<slot />
+	<div
+		on:click|stopPropagation
+		on:keypress|stopPropagation
+		class="mb-10 flex flex-col items-center"
+	>
 		<button
 			on:click={() => dialog.close()}
 			on:keypress={handleKeyPress}
-			class="mt-5 w-fit rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:bg-gray-100 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-50"
-			>Close Modal</button
+			class="w-fit self-end rounded-lg bg-white px-4 py-2 dark:bg-gray-700 dark:hover:bg-gray-400"
+			>X</button
 		>
+		<slot />
 	</div>
 </dialog>
