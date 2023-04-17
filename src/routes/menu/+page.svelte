@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { createSolution, createStartingGrid } from '$lib/utility';
+	import { Modal } from '$lib/components';
 	import type { Game } from '$lib/types';
 	import { v4 as uuid } from 'uuid';
 
 	let isTimer: boolean = true;
 	let difficulty: string = 'medium';
 	let size: number = 9;
+
+	let showModal: boolean = false;
 
 	function createGame(gameProps: Game['props']) {
 		let game: Game = {
@@ -66,49 +69,15 @@
 
 		goto(`/game/${game.id}`);
 	}
-
-	import Modal,{getModal} from './Modal.svelte'
-	
-	let selection
-	
-	// Callback function provided to the `open` function, it receives the value given to the `close` function call, or `undefined` if the Modal was closed with escape or clicking the X, etc.
-	function setSelection(res){
-		selection=res
-	}
-	
 </script>
 
-<!-- Simplest use: modal without an `id` or callback function -->
-<button class="move" on:click={()=>getModal().open()}>
-	Tutorial
-</button>
-
-<!-- the modal without an `id` -->
-<Modal>
-	<h1>Sudoku!</h1>
-	<h2>The rules for sudoku are simple.
-		A 4x4, 9×9, or 12x12 square must be filled in with numbers from 1-9 with no repeated numbers in each line, horizontally or vertically. </h2>
-		
-		<h2>To challenge you more, there are 3×3 squares marked out in the grid, and each of these squares can’t have any repeat numbers either. </h2>
-		
-		<h2>
-	   The fewer numbers provided, the more difficult the puzzle.	   
-		</h2>
-	<!-- opening a model with an `id` and specifying a callback	 -->
-	{#if selection}
-	<p>
-		Your selection was: {selection}
-	</p>
-	{/if}
-</Modal>
-
 <main class="flex flex-col items-center">
-	<header>
-		<h1 class="text-4xl">Sudoku</h1>
+	<header class="text-center">
+		<h1 class="text-4xl">Sudoku Dog</h1>
 		<p class="text-lg">A simple sudoku game</p>
 	</header>
 
-	<div class="flex w-1/4 flex-col items-center">
+	<div class="flex w-1/2 flex-col items-center">
 		<div class="flex w-full flex-row items-center justify-between">
 			<p class="p-5 text-lg">Timer</p>
 			<div class="inline-flex rounded-md shadow-sm" role="group">
@@ -201,23 +170,38 @@
 			Start
 		</button>
 	</div>
+
+	<button
+		on:click={() => (showModal = true)}
+		class="mt-24 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:bg-gray-100 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-50"
+	>
+		Tutorial
+	</button>
+
+	<Modal bind:showModal>
+		<div class="flex w-full flex-col">
+			<h1 class="mb-2 self-center text-lg font-bold">Sudoku!</h1>
+
+			<ul class="ml-5 list-disc">
+				<li class="mb-1">A Sudoku puzzle is a 9x9 grid of squares, divided into 3x3 regions.</li>
+
+				<li class="mb-1">
+					The objective is to fill the grid with numbers from 1 to 9, so that each row, column and
+					region contains each number only once. So you can’t have two ‘1’s in the same row, column
+					or region.
+				</li>
+
+				<li class="mb-1">
+					To solve a sudoku, you need to use logic to work out which numbers can go in each square.
+				</li>
+			</ul>
+		</div>
+	</Modal>
 </main>
 
 <style>
 	.active {
 		background-color: rgb(219 234 254);
 		color: rgb(23 37 84);
-	}
-
-	.move{
-		background-color: white;
-		color: Blue;
-		width: 100%;
-  		left: 0;
-  		bottom: 10px;
-  		position: absolute;
-		font-weight:bold;
-		font-variant: small-caps;
-
 	}
 </style>
