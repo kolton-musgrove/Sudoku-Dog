@@ -45,18 +45,18 @@
 	 * checks if the last move was a mistake
 	 * returns true if it was a mistake
 	 */
-	function checkForMistake(row: number, col: number, value: number) {
-		if (value === 0) return false;
+	function checkForMistake(row: number, col: number, value: number | null) {
+		if (value === null) return false;
 		// row
 		for (let i = 0; i < 9; i++) {
-			if (i !== col && game['currentBoard'][row][i] === value) {
+			if (i !== col && game.currentBoard[row][i] === value) {
 				return true;
 			}
 		}
 
 		// col
 		for (let i = 0; i < 9; i++) {
-			if (i !== row && game['currentBoard'][i][col] === value) {
+			if (i !== row && game.currentBoard[i][col] === value) {
 				return true;
 			}
 		}
@@ -67,7 +67,7 @@
 
 		for (let i = boxRow * 3; i < boxRow * 3 + 3; i++) {
 			for (let j = boxCol * 3; j < boxCol * 3 + 3; j++) {
-				if (i !== row && j !== col && game['currentBoard'][i][j] === value) {
+				if (i !== row && j !== col && game.currentBoard[i][j] === value) {
 					return true;
 				}
 			}
@@ -75,69 +75,70 @@
 	}
 
 	function isEditable(rowIndex: number, cellIndex: number) {
-		return game.originalBoard[rowIndex][cellIndex] === 0;
+		return game.originalBoard[rowIndex][cellIndex] === null;
 	}
 
-	function handleInput(event: Event) {
-		const element = event.currentTarget as HTMLInputElement;
-		const value = element.value;
+	function clear() {
+		game.currentBoard = [...game.originalBoard];
+		game = game;
+	}
 
-		if (value.length > 1) {
-			element.value = value.slice(0, 1);
-		}
-
-		if (value === '0') {
-			element.value = '';
-		}
+	function submit() {
+		// check if the game is solved
 	}
 </script>
 
 {#if game}
-	<div class="container-fluid flex">
-		<!-- timer  -->
-		{#if game.props.isTimer}
-			<h1>Timer</h1>
-			<Timer />
-		{/if}
+	<div class="flex w-full flex-col items-center justify-center align-middle">
+		<div class="flex w-1/3 flex-row justify-around">
+			<!-- timer  -->
+			{#if game.props.isTimer}
+				<Timer />
+			{/if}
 
-		<!-- difficulty -->
-		<div>
-			<h1>Difficulty</h1>
-			<p>{game.props.difficulty}</p>
+			<!-- difficulty -->
+			<div>
+				<h1 class="font-bold">Difficulty</h1>
+				<p>{game.props.difficulty.charAt(0).toUpperCase() + game.props.difficulty.slice(1)}</p>
+			</div>
 		</div>
 
 		<!-- board  -->
 		{#if game.props.size}
-			<div class="row">
-				<h1>Board</h1>
-				<div class="mx-4 w-fit">
-					{#each game.currentBoard as row, rowIndex}
-						<div class="text-2x flex text-center">
-							{#each row as cell, cellIndex}
-								<input
-									type="number"
-									class="w-12 border border-solid border-gray-200 bg-white p-3 text-center text-lg font-bold focus:bg-blue-200 dark:border-gray-500 dark:bg-gray-700"
-									class:cell-border-left={[3, 6].includes(cellIndex)}
-									class:cell-border-top={[3, 6].includes(rowIndex)}
-									class:text-black={isEditable(rowIndex, cellIndex)}
-									class:bg-red-200={checkForMistake(rowIndex, cellIndex, cell)}
-									disabled={!isEditable(rowIndex, cellIndex)}
-									maxlength="1"
-									value={cell !== 0 ? cell : ''}
-									on:change={(event) => handleChange(event, rowIndex, cellIndex)}
-									on:input={handleInput}
-								/>
-							{/each}
-						</div>
-					{/each}
-				</div>
+			<div class="m-10 w-fit">
+				{#each game.currentBoard as row, rowIndex}
+					<div class="text-2x flex text-center">
+						{#each row as cell, cellIndex}
+							<input
+								type="number"
+								class="w-12 border border-solid border-gray-200 p-3 text-center text-lg font-bold focus:bg-blue-200 dark:border-gray-500"
+								class:cell-border-left={[3, 6].includes(cellIndex)}
+								class:cell-border-top={[3, 6].includes(rowIndex)}
+								class:bg-white={!checkForMistake(rowIndex, cellIndex, cell)}
+								class:bg-red-200={checkForMistake(rowIndex, cellIndex, cell)}
+								class:dark:bg-gray-700={!checkForMistake(rowIndex, cellIndex, cell)}
+								class:dark:bg-red-500={checkForMistake(rowIndex, cellIndex, cell)}
+								disabled={!isEditable(rowIndex, cellIndex)}
+								value={cell}
+								on:change={(event) => handleChange(event, rowIndex, cellIndex)}
+							/>
+						{/each}
+					</div>
+				{/each}
 			</div>
 		{/if}
 
 		<!-- buttons  -->
 		<div class="row">
-			<button class="btn btn-primary" id="clear">Clear</button>
-			<button class="btn btn-primary" id="submit">Submit</button>
+			<button
+				on:click={clear}
+				class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:z-10 focus:ring-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white"
+				>Clear</button
+			>
+			<button
+				class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:z-10 focus:ring-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white"
+				>Submit</button
+			>
 		</div>
 		<div class="row">
 			<p class="text-m" />

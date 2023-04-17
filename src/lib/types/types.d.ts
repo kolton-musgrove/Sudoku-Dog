@@ -1,9 +1,8 @@
 export type Game = {
 	id: string;
-	currentBoard: number[][];
+	currentBoard: (number | null)[][];
 	correctBoard: number[][];
-	originalBoard: number[][];
-	mistakes: number[][]; // [x, y]
+	originalBoard: (number | null)[][];
 	timer: Timer;
 	props: {
 		isTimer: boolean;
