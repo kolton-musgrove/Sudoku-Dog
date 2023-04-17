@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { createSolution, createStartingGrid } from '$lib/utility';
+	import { Modal } from '$lib/components';
 	import type { Game } from '$lib/types';
 	import { v4 as uuid } from 'uuid';
 
 	let isTimer: boolean = true;
 	let difficulty: string = 'medium';
 	let size: number = 9;
+
+	let showModal: boolean = false;
 
 	function createGame(gameProps: Game['props']) {
 		let game: Game = {
@@ -69,12 +72,12 @@
 </script>
 
 <main class="flex flex-col items-center">
-	<header>
-		<h1 class="text-4xl">Sudoku</h1>
+	<header class="text-center">
+		<h1 class="text-4xl">Sudoku Dog</h1>
 		<p class="text-lg">A simple sudoku game</p>
 	</header>
 
-	<div class="flex w-1/4 flex-col items-center">
+	<div class="flex w-1/2 flex-col items-center">
 		<div class="flex w-full flex-row items-center justify-between">
 			<p class="p-5 text-lg">Timer</p>
 			<div class="inline-flex rounded-md shadow-sm" role="group">
@@ -167,6 +170,33 @@
 			Start
 		</button>
 	</div>
+
+	<button
+		on:click={() => (showModal = true)}
+		class="mt-24 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:bg-gray-100 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-50"
+	>
+		Tutorial
+	</button>
+
+	<Modal bind:showModal>
+		<div class="flex w-full flex-col">
+			<h1 class="mb-2 self-center text-lg font-bold">Sudoku!</h1>
+
+			<ul class="ml-5 list-disc">
+				<li class="mb-1">A Sudoku puzzle is a 9x9 grid of squares, divided into 3x3 regions.</li>
+
+				<li class="mb-1">
+					The objective is to fill the grid with numbers from 1 to 9, so that each row, column and
+					region contains each number only once. So you can’t have two ‘1’s in the same row, column
+					or region.
+				</li>
+
+				<li class="mb-1">
+					To solve a sudoku, you need to use logic to work out which numbers can go in each square.
+				</li>
+			</ul>
+		</div>
+	</Modal>
 </main>
 
 <style>

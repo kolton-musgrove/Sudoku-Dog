@@ -1,3 +1,4 @@
 import Timer from './timer.svelte';
+import Modal from './modal.svelte';
 
-export { Timer };
+export { Timer, Modal };
