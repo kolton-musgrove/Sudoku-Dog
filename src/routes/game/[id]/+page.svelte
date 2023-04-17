@@ -116,7 +116,7 @@
 							{#each row as cell, cellIndex}
 								<input
 									type="number"
-									class="w-12 border bg-white p-3 text-center text-lg font-bold focus:bg-blue-200"
+									class="w-12 border border-solid border-gray-200 bg-white p-3 text-center text-lg font-bold focus:bg-blue-200 dark:border-gray-500 dark:bg-gray-700"
 									class:cell-border-left={[3, 6].includes(cellIndex)}
 									class:cell-border-top={[3, 6].includes(rowIndex)}
 									class:text-black={isEditable(rowIndex, cellIndex)}
@@ -147,10 +147,10 @@
 
 <style>
 	.cell-border-left {
-		@apply border-l-2 border-solid border-l-black;
+		@apply border-l-2 border-solid border-l-black dark:border-l-white;
 	}
 
 	.cell-border-top {
-		@apply border-t-2 border-solid border-t-black;
+		@apply border-t-2 border-solid border-t-black dark:border-t-white;
 	}
 </style>
