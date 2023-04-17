@@ -16,7 +16,7 @@
 	on:close={() => (showModal = false)}
 	on:click|self={() => dialog.close()}
 	on:keypress={handleKeyPress}
-	class="w-3/4 rounded-lg text-gray-200 shadow-lg dark:bg-gray-700"
+	class="w-3/4 rounded-lg shadow-lg dark:bg-gray-700 dark:text-gray-200"
 >
 	<div
 		on:click|stopPropagation
