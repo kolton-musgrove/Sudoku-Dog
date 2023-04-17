@@ -5,116 +5,152 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+	let game: Game;
 
-	let correctBoard: Game['correctBoard'];
-	let currentBoard: Game['currentBoard'];
-	let timer: Game['props']['timer'];
-	let difficulty: Game['props']['difficulty'];
-	let size: Game['props']['size'];
-
-	// the following code in in onMount to force it to run on the client only.
+	// we wait for the component to mount before we get the game from local storage
+	// because svelte will try to run this code on the server where there is no local storage
 	onMount(() => {
-		if (data.id) {
-			// attempt to load game from storage
-			const game = getGameFromStorage(data.id);
-
-			// if game is found, load it
-			loadGame(game);
-		} else {
-			// handle error or redirect
-			throw new Error('Game not found');
-		}
+		game = getGameFromStorage(data.id);
 	});
 
+	/**
+	 * gets the game from local storage with error handling
+	 */
 	function getGameFromStorage(id: string): Game {
 		const unparsedGame = localStorage.getItem(id);
-
 		if (!unparsedGame) throw new Error('No game found');
 
 		const game: Game = JSON.parse(unparsedGame);
-
 		if (!game) throw new Error('No game associated with this id');
 
 		return game;
 	}
 
-	function loadGame(game: Game) {
-		correctBoard = game.correctBoard;
-		currentBoard = game.currentBoard;
-		timer = game.props.timer;
-		difficulty = game.props.difficulty;
-		size = game.props.size;
-
-		console.log(game);
-	}
-
-	function handleInput(event: Event, rowIndex: number, cellIndex: number) {
+	/**
+	 * handles user input, checks for mistakes, and saves the game
+	 */
+	function handleChange(event: Event, rowIndex: number, cellIndex: number) {
 		const target = event.target as HTMLInputElement;
 		const value = target.value;
 
-		currentBoard[rowIndex][cellIndex] = parseInt(value);
-		currentBoard = currentBoard;
+		game.currentBoard[rowIndex][cellIndex] = parseInt(value);
+
+		game = game;
+
+		// save game
+		localStorage.setItem(game.id, JSON.stringify(game));
+	}
+
+	/**
+	 * checks if the last move was a mistake
+	 * returns true if it was a mistake
+	 */
+	function checkForMistake(row: number, col: number, value: number) {
+		if (value === 0) return false;
+		// row
+		for (let i = 0; i < 9; i++) {
+			if (i !== col && game['currentBoard'][row][i] === value) {
+				return true;
+			}
+		}
+
+		// col
+		for (let i = 0; i < 9; i++) {
+			if (i !== row && game['currentBoard'][i][col] === value) {
+				return true;
+			}
+		}
+
+		// box
+		const boxRow = Math.floor(row / 3);
+		const boxCol = Math.floor(col / 3);
+
+		for (let i = boxRow * 3; i < boxRow * 3 + 3; i++) {
+			for (let j = boxCol * 3; j < boxCol * 3 + 3; j++) {
+				if (i !== row && j !== col && game['currentBoard'][i][j] === value) {
+					return true;
+				}
+			}
+		}
+	}
+
+	function isEditable(rowIndex: number, cellIndex: number) {
+		return game.originalBoard[rowIndex][cellIndex] === 0;
+	}
+
+	function handleInput(event: Event) {
+		const element = event.currentTarget as HTMLInputElement;
+		const value = element.value;
+
+		if (value.length > 1) {
+			element.value = value.slice(0, 1);
+		}
+
+		if (value === '0') {
+			element.value = '';
+		}
 	}
 </script>
 
-<div class="container-fluid flex">
-	<!-- timer  -->
-	{#if timer}
-		<h1>Timer</h1>
-		<Timer />
-	{/if}
+{#if game}
+	<div class="container-fluid flex">
+		<!-- timer  -->
+		{#if game.props.isTimer}
+			<h1>Timer</h1>
+			<Timer />
+		{/if}
 
-	<!-- difficulty -->
-	{#if difficulty}
+		<!-- difficulty -->
 		<div>
 			<h1>Difficulty</h1>
-			<p>{difficulty.toUpperCase()}</p>
+			<p>{game.props.difficulty}</p>
 		</div>
-	{/if}
 
-	<!-- board  -->
-	{#if size}
-		<div class="row">
-			<h1>Board</h1>
-			<div class="mx-4 w-fit">
-				{#each currentBoard as row, rowIndex}
-					<div
-						class="text-center flex text-2xl {[3, 6].includes(rowIndex)
-							? 'border-t-2 border-solid border-black dark:border-white'
-							: 'dark:border-gray-500'}"
-					>
-						{#each row as cell, cellIndex}
-							<div
-								class="text-center border p-4 {[3, 6].includes(cellIndex)
-									? 'border-l-2 border-t-gray-200 border-r-gray-200 border-b-gray-200 border-solid border-black dark:border-t-gray-500 dark:border-r-gray-500 dark:border-b-gray-500 dark:border-white'
-									: 'dark:border-gray-500'}"
-							>
+		<!-- board  -->
+		{#if game.props.size}
+			<div class="row">
+				<h1>Board</h1>
+				<div class="mx-4 w-fit">
+					{#each game.currentBoard as row, rowIndex}
+						<div class="text-2x flex text-center">
+							{#each row as cell, cellIndex}
 								<input
 									type="number"
-									class="w-5 h-5 text-center text-md font-bold dark:bg-gray-700"
+									class="w-12 border border-solid border-gray-200 bg-white p-3 text-center text-lg font-bold focus:bg-blue-200 dark:border-gray-500 dark:bg-gray-700"
+									class:cell-border-left={[3, 6].includes(cellIndex)}
+									class:cell-border-top={[3, 6].includes(rowIndex)}
+									class:text-black={isEditable(rowIndex, cellIndex)}
+									class:bg-red-200={checkForMistake(rowIndex, cellIndex, cell)}
+									disabled={!isEditable(rowIndex, cellIndex)}
+									maxlength="1"
 									value={cell !== 0 ? cell : ''}
-									on:change={(event) => handleInput(event, rowIndex, cellIndex)}
-									on:input={(event) => {
-										event.target.value = event.target.value.slice(0, 1);
-										if (event.target.value == "0") {
-											event.target.value = "";
-										}
-									}}
+									on:change={(event) => handleChange(event, rowIndex, cellIndex)}
+									on:input={handleInput}
 								/>
-							</div>
-						{/each}
-					</div>
-				{/each}
+							{/each}
+						</div>
+					{/each}
+				</div>
 			</div>
-		</div>
-	{/if}
+		{/if}
 
-	<!-- buttons  -->
-	<div class="row">
-		<button class="btn btn-primary" id="clear">Clear</button>
-		<button class="btn btn-primary" id="submit">Submit</button>
+		<!-- buttons  -->
+		<div class="row">
+			<button class="btn btn-primary" id="clear">Clear</button>
+			<button class="btn btn-primary" id="submit">Submit</button>
+		</div>
+		<div class="row">
+			<p class="text-m" />
+		</div>
 	</div>
-	<div class="row">
-		<p class="text-m" />
-	</div>
-</div>
+{/if}
+
+<style>
+	.cell-border-left {
+		@apply border-l-2 border-solid border-l-black dark:border-l-white;
+	}
+
+	.cell-border-top {
+		@apply border-t-2 border-solid border-t-black dark:border-t-white;
+	}
+</style>

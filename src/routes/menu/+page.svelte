@@ -1,28 +1,36 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { createSolution, grid } from '$lib/utility';
+	import { createSolution, createStartingGrid } from '$lib/utility';
+	import { Modal } from '$lib/components';
 	import type { Game } from '$lib/types';
 	import { v4 as uuid } from 'uuid';
 
-	let timer: boolean = true;
+	let isTimer: boolean = true;
 	let difficulty: string = 'medium';
 	let size: number = 9;
+
+	let showModal: boolean = false;
 
 	function createGame(gameProps: Game['props']) {
 		let game: Game = {
 			id: uuid(),
 			currentBoard: [],
 			correctBoard: [],
+			originalBoard: [],
+			mistakes: [],
+			timer: {
+				state: 'stopped',
+				duration: 0
+			},
 			props: {
-				timer,
+				isTimer,
 				difficulty,
 				size
 			}
 		};
 
-		// We need to create a function to generate a starting grid
-		// const grid = createStartingGrid()
-		// create a solution to the grid
+		const grid: number[][] = createStartingGrid();
+
 		createSolution(grid);
 
 		game.correctBoard = grid.map((row: number[]) => [...row]);
@@ -31,7 +39,7 @@
 		if (gameProps.difficulty === 'easy') {
 			grid.map((row, i) => {
 				row.map((col, j) => {
-					if (Math.random() < 0.4) {
+					if (Math.random() < 0.5) {
 						grid[i][j] = 0;
 					}
 				});
@@ -39,7 +47,7 @@
 		} else if (gameProps.difficulty === 'medium') {
 			grid.map((row, i) => {
 				row.map((col, j) => {
-					if (Math.random() < 0.5) {
+					if (Math.random() < 0.6) {
 						grid[i][j] = 0;
 					}
 				});
@@ -55,6 +63,7 @@
 		}
 
 		game.currentBoard = grid;
+		game.originalBoard = grid.map((row: number[]) => [...row]);
 
 		localStorage.setItem(game.id, JSON.stringify(game));
 
@@ -63,41 +72,41 @@
 </script>
 
 <main class="flex flex-col items-center">
-	<header>
-		<h1 class="text-4xl">Sudoku</h1>
+	<header class="text-center">
+		<h1 class="text-4xl">Sudoku Dog</h1>
 		<p class="text-lg">A simple sudoku game</p>
 	</header>
 
-	<div class="flex flex-col items-center w-1/4">
-		<div class="flex flex-row items-center w-full justify-between">
+	<div class="flex w-1/2 flex-col items-center">
+		<div class="flex w-full flex-row items-center justify-between">
 			<p class="p-5 text-lg">Timer</p>
 			<div class="inline-flex rounded-md shadow-sm" role="group">
 				<button
-					on:click={() => (timer = true)}
+					on:click={() => (isTimer = true)}
 					type="button"
-					class:active={timer === true}
-					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active:bg-gray-100 active:text-blue-700"
+					class:active={isTimer === true}
+					class="rounded-l-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:bg-gray-100 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 				>
 					Yes
 				</button>
 				<button
-					on:click={() => (timer = false)}
+					on:click={() => (isTimer = false)}
 					type="button"
-					class:active={timer === false}
-					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active:bg-grey-100 active:text-blue-700"
+					class:active={isTimer === false}
+					class="active:bg-grey-100 rounded-r-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 				>
 					No
 				</button>
 			</div>
 		</div>
-		<div class="flex flex-row items-center  w-full justify-between">
+		<div class="flex w-full flex-row items-center justify-between">
 			<p class="p-5 text-lg">Difficulty</p>
 			<div class="inline-flex rounded-md shadow-sm" role="group">
 				<button
 					on:click={() => (difficulty = 'easy')}
 					type="button"
 					class:active={difficulty === 'easy'}
-					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active:bg-gray-100 active:text-blue-700"
+					class="rounded-l-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:bg-gray-100 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 				>
 					Easy
 				</button>
@@ -105,7 +114,7 @@
 					on:click={() => (difficulty = 'medium')}
 					type="button"
 					class:active={difficulty === 'medium'}
-					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active:bg-grey-100 active:text-blue-700"
+					class="active:bg-grey-100 border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 				>
 					Medium
 				</button>
@@ -113,20 +122,20 @@
 					on:click={() => (difficulty = 'hard')}
 					type="button"
 					class:active={difficulty === 'hard'}
-					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active:bg-grey-100 active:text-blue-700"
+					class="active:bg-grey-100 rounded-r-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 				>
 					Hard
 				</button>
 			</div>
 		</div>
-		<div class="flex flex-row items-center  w-full justify-between">
+		<div class="flex w-full flex-row items-center justify-between">
 			<p class="p-5 text-lg">Size</p>
 			<div class="inline-flex rounded-md shadow-sm" role="group">
 				<button
 					on:click={() => (size = 4)}
 					type="button"
 					class:active={size === 4}
-					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active:bg-gray-100 active:text-blue-700"
+					class="rounded-l-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:bg-gray-100 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 				>
 					4x4
 				</button>
@@ -134,7 +143,7 @@
 					on:click={() => (size = 9)}
 					type="button"
 					class:active={size === 9}
-					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active:bg-grey-100 active:text-blue-700"
+					class="active:bg-grey-100 border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 				>
 					9x9
 				</button>
@@ -142,7 +151,7 @@
 					on:click={() => (size = 16)}
 					type="button"
 					class:active={size === 16}
-					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active:bg-grey-100 active:text-blue-700"
+					class="active:bg-grey-100 rounded-r-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 				>
 					16x16
 				</button>
@@ -155,12 +164,39 @@
 			>Start</a
 		> -->
 		<button
-			on:click={() => createGame({ timer, difficulty, size })}
-			class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg rounded-r-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+			on:click={() => createGame({ isTimer, difficulty, size })}
+			class="rounded-l-lg rounded-r-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
 		>
 			Start
 		</button>
 	</div>
+
+	<button
+		on:click={() => (showModal = true)}
+		class="mt-24 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 active:bg-gray-100 active:text-blue-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-50"
+	>
+		Tutorial
+	</button>
+
+	<Modal bind:showModal>
+		<div class="flex w-full flex-col">
+			<h1 class="mb-2 self-center text-lg font-bold">Sudoku!</h1>
+
+			<ul class="ml-5 list-disc">
+				<li class="mb-1">A Sudoku puzzle is a 9x9 grid of squares, divided into 3x3 regions.</li>
+
+				<li class="mb-1">
+					The objective is to fill the grid with numbers from 1 to 9, so that each row, column and
+					region contains each number only once. So you can’t have two ‘1’s in the same row, column
+					or region.
+				</li>
+
+				<li class="mb-1">
+					To solve a sudoku, you need to use logic to work out which numbers can go in each square.
+				</li>
+			</ul>
+		</div>
+	</Modal>
 </main>
 
 <style>
